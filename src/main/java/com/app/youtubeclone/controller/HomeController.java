@@ -39,6 +39,13 @@ public class HomeController {
     public String viewHomePage(Model model) {
         return findPage(1, "title", "asc", "", "", model);
     }
+    
+    
+    @GetMapping("/home")
+    public String HomePage(Model model) {
+        return findPage(1, "title", "asc", "", "", model);
+    }
+
 
     @GetMapping("/create")
     public String create() {
