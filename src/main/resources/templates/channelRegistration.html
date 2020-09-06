@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Page</title>
+    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+</head>
+<body>
+<div class="topnav">
+    <a th:href="@{/}">Back</a>
+</div>
+<div class="form">
+    <form action="/channelRegistration" method="post" enctype="multipart/form-data">
+        <h2>Channel Registration</h2> <hr>
+        <label for="name">Channel Name</label> <br>
+        <input type="text" name="name" id="name" placeholder="Enter your Channel Name" required> <br>
+        <label for="description">Description</label> <br>
+        <textarea name="description" id="description" cols="30" rows="10" placeholder="Enter your Channel Description"
+                  required></textarea> <br>
+
+        <label for="thumbnail">Upload Cover Picture (only .jpg, .jpeg or .png)</label> <br>
+        <input type="file" name="thumbnail" max-size="2000" id="thumbnail" required> <br>
+        <hr>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <input type="submit" value="Create Your Channel">
+    </form>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+
+<head>
+
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial;
+            padding: 20px;
+            background: black;
+            color: white;
+        }
+
+        .header {
+            padding: 10px;
+            text-align: center;
+            background: #131313;
+        }
+
+        .leftcolumn {
+            float: left;
+            width: 50%;
+        }
+
+        .rightcolumn {
+            float: left;
+            width: 50%;
+            padding-left: 20px;
+        }
+
+        .video{
+            background: #131313;
+            width:40%;
+            padding: 20px;
+        }
+
+        .thumb img{
+            background: #131313;
+            width: 40%;
+            padding: 20px;
+        }
+
+
+        .card {
+            background: #131313;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .row:after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+
+        .header{
+            text-align:center;
+            font-size:30px;
+        }
+
+
+        button {
+            padding: 10px;
+            background: #f3f3f3;
+            color: #232323;
+            border: none;
+            margin-top: 20px;
+            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+
+        button:hover {
+            color: #f3f3f3;
+            background: #232323;
+        }
+
+        .content p {
+            display: inline-block;
+            margin-right: 25px;
+        }
+
+        .content {
+            margin-left: 10%;
+        }
+
+        textarea {
+            width: 90%;
+            background: #f4f4f4;
+            margin-top: 20px;
+        }
+
+        details {
+            margin-top: 15px;
+        }
+
+        .topnav {
+              display:flex;
+              flex-wrap:nowrap;
+              justify-content: space-between;
+              overflow: hidden;
+               background: #131313;
+        }
+
+        .topnav a {
+          float: left;
+          color: #f2f2f2;
+          text-align: center;
+          padding: 14px 16px;
+          text-decoration: none;
+          font-size: 17px;
+        }
+
+        .topnav a:hover {
+          background-color: #ddd;
+          color: black;
+        }
+        .paging{
+          color: white;}
+
+         a{
+         text-decoration: none;
+         color: white;}
+
+    </style>
+</head>
+
+<body>
+
+<!-- header -->
+<div class="header"><strong> YouTube - Clone</strong></div>
+<br>
+<div class="topnav">
+    <a th:href="@{/}">Home</a>
+    <a th:href="@{/trending}">Trending</a>
+
+
+    <!-- write if else condition to show this (if has channel show my channel else create channel-->
+    <a th:href="@{/create}">Create Channel</a>
+    <a th:href="@{/mychannel}">My Channel</a>
+
+
+    <!-- write if condition to show this only if logged in-->
+    <a th:href="@{/mylibrary}">My Library</a>
+    <a th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
+    <!-- else -->
+    <a th:href="@{/loginpage}">Login</a>
+    <a th:href="@{/signIn}">Sign Up</a>
+
+    <div>
+        <form action="#" style="display:block; float:right;"
+              th:action="@{'/page/' + ${currentPage}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection}+ ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">
+            <input type="hidden" name="sortField" th:value="${sortField}">
+            <input type="hidden" name="sortDirection" th:value="${sortDirection}">
+            <input type="text" placeholder="Keyword.." name="keyword">
+            <button  type="submit" value="Search">Search</button>
+        </form>
+    </div>
+    <!--    <a th:href="@{/watchLater}">Trending</a>-->
+</div>
+<br>
+<br>
+<div class="paging">
+    <div th:if="${totalPages > 1}">
+        Total Rows: [[${totalItems}]] &nbsp; &nbsp;
+        <a th:if="${currentPage > 1}"
+           th:href="@{'/page/' + ${currentPage -1}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">Prev</a>
+        <span th:unless="${currentPage > 1}">Prev</span>
+        <span th:each="i: ${#numbers.sequence(1, totalPages)}">&nbsp;<a th:if="${currentPage != i}"
+                                                                        th:href="@{'/page/' + ${i}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">[[${i}]]</a>
+                    <span th:unless="${currentPage != i}">[[${i}]]</span>  &nbsp;
+                </span> &nbsp;
+        <a th:if="${currentPage < totalPages}"
+           th:href="@{'/page/' + ${currentPage + 1}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">Next</a>
+        <span th:unless="${currentPage < totalPages}">Next</span>
+    </div>
+</div>
+
+
+
+<!-- Header -->
+
+
+<!-- First blog-->
+<div class="flow" th:each="temp:${list}">
+    <br>
+    <div class="header">
+        <h2 th:text="${temp.title}"></h2>
+    </div>
+
+    <div class="row">
+        <div class="leftcolumn">
+            <div class="card">
+                <h2 th:text="${temp.owner}"></h2>
+                <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
+                <div>
+                    <video style="width:100%;" th:src="@{${temp.videoUrl}}" controls></video>
+                </div>
+                <p>Video Description</p>
+                <p th:text="${temp.description}"></p>
+                <button type="submit">
+                    <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
+                </button>
+                <form action="/watchlater" method="post">
+                    <button type="submit">Add to Watch Later</button>
+                </form>
+            </div>
+
+        </div>
+        <div class="rightcolumn">
+            <div class="card">
+                <div class="thumb">
+                    <img th:src="@{${temp.thumbnailUrl}}" alt="">
+                </div>
+                <div class="content">
+                    <form action="/like" method="post">
+                        <button type="submit">
+                            <i class="fas fa-thumbs-up" th:text="'  '+${temp.likes}" style="font-size:20px;"></i></button>
+                    </form>
+                    <form action="/dislike" method="post">
+                        <button type="submit">
+                            <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i> </button>
+                    </form>
+
+                    <details>
+                        <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
+                        <div th:each="temp2:${temp.mediaComment}">
+                            <li th:text="${temp2.commentby} + ' : '+${temp2.comment}"></li>
+                        </div>
+
+                    </details>
+                    <textarea></textarea> <br>
+                    <button>Add Comment</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> <br><br>
+<!-- End of first blog-->
+
+</body>
+
+</html>

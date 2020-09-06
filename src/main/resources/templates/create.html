@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link th:href="@{/css/login.css}" rel="stylesheet"/>
+    <title>Upload Page</title>
+</head>
+<body>
+<div class="topnav">
+    <a th:href="@{/}">Back</a>
+</div>
+<div class="form">
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <h2>Upload Your Video Here!</h2>
+        <label for="title">Title</label> <br>
+        <input type="text" name="title" id="title" placeholder="Enter your title" required=""> <br>
+        <label >Description</label> <br>
+        <textarea name="description" id="" cols="30" rows="10" placeholder="Enter your description" required=""></textarea> <br>
+        <label for="tags">Tags</label> <br>
+        <select name="tags" id="tags" required="">
+            <option value="Music">Music</option>
+            <option value="Gaming">Gaming</option>
+            <option value="News">News</option>
+            <option value="Fashion">Fashion and Beauty</option>
+            <option value="Learning">Learning</option>
+            <option value="Food">Food</option>
+            <option value="Travel">Travel</option>
+        </select> <br>
+        <label for="thumbnail">Upload Thumbnail (only .jpg, .jpeg or .png)</label> <br>
+        <input type="file" name="thumbnail" max-size="2000" id="thumbnail" required=""> <br>
+        <label for="video">Upload Video (only .mp4 or .mkv)</label> <br>
+        <input type="file" name="video" id="video" required=""> <br>
+        <input type="text" name="duration" id="duration" hidden><br>
+        <audio id="audio"></audio>
+        <label >Visibility</label> <br>
+        <select name="visibility" required="">
+            <option value="Public">Public</option>
+            <option value="Private">Private</option>
+        </select> <br>
+        <label>Restriction</label> <br>
+        <select name="restriction" id="tag" required="">
+            <option value="Anyone">Anyone can watch</option>
+            <option value="Adults">Only for adults</option>
+        </select> <br>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <input type="submit" value="Publish Video">
+    </form>
+</div>
+
+<script>
+var f_duration =0;
+document.getElementById('audio').addEventListener('canplaythrough', function(e){
+  f_duration = e.currentTarget.duration.toFixed(2);
+  document.getElementById('duration').value = f_duration;
+  URL.revokeObjectURL(obUrl);
+});
+var obUrl;
+document.getElementById('video').addEventListener('change', function(e){
+  var file = e.currentTarget.files[0];
+  if(file.name.match(/\.(mkv|mp4)$/i)){
+    obUrl = URL.createObjectURL(file);
+    document.getElementById('audio').setAttribute('src', obUrl);
+  }
+});
+</script>
+</body>
+</html>
