@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -112,9 +113,16 @@ public class HomeController {
         return userService.register(name,email,password);
     }
 
-    @GetMapping("/mylibrary")
-    public String mylibrary(Model model){
-        List<MediaFile> mediaFiles = mediaFileRepo.findTop2ByOrderByViewsDesc();
+    @GetMapping("/myLibrary")
+    public String myLibrary(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+
+        List<MediaFile> mediaFiles = new ArrayList<>();
+        List<Integer> mediaFilesId = libraryRepo.findMedia(users.getId());
+        for(int i:mediaFilesId){
+            mediaFiles.add(mediaFileRepo.findById(i).get());
+        }
         List<MediaFile> list = new LinkedList<>();
         mediaFiles.forEach(video -> {
             MediaFile mediaFileDTO = new MediaFile();
@@ -145,13 +153,19 @@ public class HomeController {
             mediaFileDTO.setMediaComment(commentDTOS);
             list.add(mediaFileDTO);
         });
+        model.addAttribute("mediaFiles", mediaFiles);
         model.addAttribute("list", list);
-        return "mylibrary";
+
+        if(users != null){
+            model.addAttribute("sessionUser",users.getName());
+            model.addAttribute("sessionId",users.getId());
+            model.addAttribute("hasChannel",users.getStatus());
+        }
+        return "home";
     }
 
     @GetMapping("/mychannel")
     public String mychannel(Model model) {
-
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Users users = usersRepo.findByEmail(auth.getName());
         List<MediaFile> mediaFiles = mediaFileRepo.myvideos(users.getEmail());
@@ -259,14 +273,13 @@ public class HomeController {
             model.addAttribute("sessionId",users.getId());
             model.addAttribute("hasChannel",users.getStatus());
         }
-
         return "home";
     }
 
     @GetMapping("/trending")
     public String trending(Model model) {
         List<MediaFile> mediaFiles = mediaFileRepo.findTop2ByOrderByViewsDesc();
-        List<MediaFile> list = new LinkedList<>();
+        List<MediaFile> listDTOS = new LinkedList<>();
         mediaFiles.forEach(video -> {
             MediaFile mediaFileDTO = new MediaFile();
             mediaFileDTO.setTitle(video.getTitle());
@@ -294,18 +307,29 @@ public class HomeController {
                 commentDTOS.add(commentDTO);
             });
             mediaFileDTO.setMediaComment(commentDTOS);
-            list.add(mediaFileDTO);
+            listDTOS.add(mediaFileDTO);
         });
-        model.addAttribute("list", list);
+        model.addAttribute("list", listDTOS);
+        model.addAttribute("mediaFiles", mediaFiles);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        if(users != null){
+            model.addAttribute("sessionUser",users.getName());
+            model.addAttribute("sessionId",users.getId());
+            model.addAttribute("hasChannel",users.getStatus());
+        }
         return "home";
     }
 
-    @GetMapping("/watchLater")
-    public String watchLater(Model model) {
-        // List<MediaFile> mediaFiles = mediaFileRepo.findAllWatchLater();
-        // model.addAttribute("mediaFiles",mediaFiles);
-        MediaComment mediaComment = new MediaComment();
-        model.addAttribute("mediaComment", mediaComment);
+    @PostMapping("/watchLater")
+    public String watchLater(@RequestParam("id")int id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        Library library = new Library();
+        library.setUserId(users.getId());
+        library.setVideoId(id);
+        libraryRepo.save(library);
         return "home";
     }
 
@@ -370,8 +394,6 @@ public class HomeController {
         commentService.deleteCommentById(id);
         return "redirect:/";
     }
-
-
 
     @PostMapping("/deletevideo")
     public String deletevideo(@RequestParam int id){

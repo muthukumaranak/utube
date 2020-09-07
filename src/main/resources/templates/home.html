@@ -148,7 +148,7 @@
     </span>
 
     <!-- write if condition to show this only if logged in-->
-    <a th:if="${sessionUser != null}" th:href="@{/mylibrary}">My Library</a>
+    <a th:if="${sessionUser != null}" th:href="@{/myLibrary}">My Library</a>
     <a  th:if="${sessionUser != null}" th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
     <!-- else -->
     <a th:if="${sessionUser == null}" th:href="@{/loginpage}">Login</a>
@@ -194,25 +194,26 @@
     </div>
 
     <div class="row">
+
         <div class="leftcolumn">
             <div class="card">
-                <h2 th:text="${temp.owner}"></h2>
-                <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
-                <h5 th:text="'Duration '+${temp.duration}"></h5>
-                <div>
-                    <video style="width:100%;" th:src="@{${temp.videoUrl}}" controls></video>
-                </div>
-                <p>Video Description</p>
-                <p th:text="${temp.description}"></p>
-                <button type="submit">
-                    <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
-                </button>
-                <form action="/watchlater" method="post">
-                    <button type="submit">Add to Watch Later</button>
+                <form th:action="@{/watchLater(id=${temp.id})}" th:object="${temp}" method="post">
+                    <h2 th:text="${temp.owner}"></h2>
+                    <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
+                    <div>
+                        <video style="width:100%;" th:src="@{${temp.videoUrl}}" controls></video>
+                    </div>
+                    <p>Video Description</p>
+                    <p th:text="${temp.description}"></p>
+                    <button type="submit">
+                        <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
+                    </button>
+                    <input type="submit" value="Add to Watch Later">
                 </form>
             </div>
 
         </div>
+
         <div class="rightcolumn">
             <div class="card">
                 <div class="thumb">

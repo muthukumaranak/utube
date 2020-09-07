@@ -1,6 +1,7 @@
 package com.app.youtubeclone.service.impl;
 
 import com.app.youtubeclone.entity.MediaComment;
+import com.app.youtubeclone.entity.MediaFile;
 import com.app.youtubeclone.repository.MediaCommentRepo;
 import com.app.youtubeclone.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;

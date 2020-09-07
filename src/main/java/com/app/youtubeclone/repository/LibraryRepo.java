@@ -3,6 +3,7 @@ package com.app.youtubeclone.repository;
 import com.app.youtubeclone.entity.Library;
 import com.app.youtubeclone.entity.MediaFile;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -10,6 +11,8 @@ import java.util.List;
 @Repository
 public interface LibraryRepo extends JpaRepository<Library, Integer> {
 
+    @Query(value = "select * from media_file where id IN (select video_id from library where user_id = ?1)",nativeQuery = true)
+    public List<Integer> findMedia(int userId);
 
     public List<MediaFile> findAllByUserId(int userId);
 }
