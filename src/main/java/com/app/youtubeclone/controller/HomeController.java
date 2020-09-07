@@ -1,20 +1,23 @@
 package com.app.youtubeclone.controller;
 
-import com.app.youtubeclone.entity.Library;
-import com.app.youtubeclone.entity.MediaComment;
-import com.app.youtubeclone.entity.MediaFile;
-import com.app.youtubeclone.entity.Users;
+import com.app.youtubeclone.entity.*;
+import com.app.youtubeclone.repository.ChannelRepo;
 import com.app.youtubeclone.repository.LibraryRepo;
 import com.app.youtubeclone.repository.MediaFileRepo;
+import com.app.youtubeclone.repository.UsersRepo;
+import com.app.youtubeclone.service.ChannelService;
+import com.app.youtubeclone.service.CommentService;
 import com.app.youtubeclone.service.MediaService;
 import com.app.youtubeclone.service.UserService;
+import com.app.youtubeclone.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.repository.query.Param;
-import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -22,6 +25,9 @@ import java.util.List;
 
 @Controller
 public class HomeController {
+
+    @Autowired
+    private CommentService commentService;
 
     @Autowired
     private MediaService mediaService;
@@ -33,23 +39,49 @@ public class HomeController {
     private LibraryRepo libraryRepo;
 
     @Autowired
+    private UsersRepo usersRepo;
+
+    @Autowired
+    private ChannelRepo channelRepo;
+
+
+    @Autowired
     UserService userService;
+
+    @Autowired
+    ChannelService channelService;
+
+    public String sessionUser;
+    public String sessionEmail;
+    public int sessionId;
+
 
     @GetMapping("/")
     public String viewHomePage(Model model) {
-        return findPage(1, "title", "asc", "", "", model);
-    }
-    
-    
-    @GetMapping("/home")
-    public String HomePage(Model model) {
-        return findPage(1, "title", "asc", "", "", model);
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        System.err.println(auth.getName());
+        return findPage(1, "title",
+                "asc", "", "", model);
     }
 
+    @GetMapping("/home")
+    public String HomePage(Model model, String sessionEmail, String sessionUser) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        System.err.println(auth.getName());
+        return findPage(1, "title",
+                "asc", "", "", model);
+    }
+
+    @GetMapping("/postvideo")
+    public String postvideo(){
+        return "create";
+    }
 
     @GetMapping("/create")
     public String create() {
-        return "create";
+        return "channelRegistration";
     }
 
     @GetMapping("/channel")
@@ -58,7 +90,8 @@ public class HomeController {
     }
 
     @GetMapping("/loginpage2")
-    public String login(){
+    public String login(Model model){
+       // model.addAttribute("name",sessionName);
         return "redirect:/";
     }
 
@@ -76,7 +109,6 @@ public class HomeController {
     @PostMapping("/user")
     public String userRegister(@RequestParam String name, @RequestParam String email,
                                @RequestParam String password){
-        System.out.println("Controller called");
         return userService.register(name,email,password);
     }
 
@@ -119,7 +151,10 @@ public class HomeController {
 
     @GetMapping("/mychannel")
     public String mychannel(Model model) {
-        List<MediaFile> mediaFiles = mediaFileRepo.findTop2ByOrderByViewsDesc();
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        List<MediaFile> mediaFiles = mediaFileRepo.myvideos(users.getEmail());
         List<MediaFile> list = new LinkedList<>();
         mediaFiles.forEach(video -> {
             MediaFile mediaFileDTO = new MediaFile();
@@ -151,6 +186,19 @@ public class HomeController {
             list.add(mediaFileDTO);
         });
         model.addAttribute("list", list);
+        List<Channel> channelList = channelRepo.findByOwner(users.getEmail());
+        List<Channel> channels = new LinkedList<>();
+
+        channelList.forEach(channelcontent -> {
+                    Channel channel = new Channel();
+                    channel.setChannel(channelcontent.getChannel());
+                    channel.setCoverUrl(channelcontent.getCoverUrl());
+                    channel.setDescription(channelcontent.getDescription());
+                    channel.setSubscribers(channelcontent.getSubscribers());
+                    channel.setCreatedAt(channelcontent.getCreatedAt());
+                    channels.add(channel);
+                });
+        model.addAttribute("channel",channels);
         return "mychannel";
     }
 
@@ -203,8 +251,15 @@ public class HomeController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("tag", tag);
         model.addAttribute("mediaFiles", mediaFiles);
-        Users users = new Users();
-        model.addAttribute("users",users);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        if(users != null){
+            model.addAttribute("sessionUser",users.getName());
+            model.addAttribute("sessionId",users.getId());
+            model.addAttribute("hasChannel",users.getStatus());
+        }
+
         return "home";
     }
 
@@ -255,7 +310,8 @@ public class HomeController {
     }
 
     @GetMapping("/setWatchLater/{id}")
-    public String setWatchLater(@ModelAttribute("mediaComment") MediaComment comment, Model model, @PathVariable("id") int mediaId, @ModelAttribute("mediaFiles") MediaFile mediaFiles) {
+    public String setWatchLater(@ModelAttribute("mediaComment") MediaComment comment, Model model, @PathVariable("id")
+            int mediaId, @ModelAttribute("mediaFiles") MediaFile mediaFiles) {
         MediaFile mediaFile = mediaFileRepo.findById(mediaId).get();
         model.addAttribute("mediaComment", comment);
         model.addAttribute("mediaFiles", mediaFiles);
@@ -281,4 +337,32 @@ public class HomeController {
         model.addAttribute("mediaComment", mediaComment);
         return "home";
     }
+
+    @GetMapping("/signIn")
+    public String signIn() {
+        return "userRegistration";
+    }
+
+    @PostMapping("/userRegistration")
+    public String userRegistration(@RequestParam("name") String name, @RequestParam("email") String email,
+                                   @RequestParam("password") String password){
+        return userService.register(name, email, password);
+    }
+
+    @PostMapping("/channel")
+    public String channelRegistration(@RequestParam String name, @RequestParam String description,
+                                      @RequestParam("thumbnail") MultipartFile thumbnail){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        return channelService.register(name, description, thumbnail, users.getEmail());
+    }
+
+    @PostMapping("/deletecomment")
+    public String deleteComment(@RequestParam int id){
+        System.err.println(id);
+        commentService.deleteCommentById(id);
+        return "redirect:/mychannel";
+    }
+
 }
+

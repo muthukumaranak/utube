@@ -1,6 +1,5 @@
 package com.app.youtubeclone.config;
 
-import com.app.youtubeclone.service.MyUserDetailService;
 import com.app.youtubeclone.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

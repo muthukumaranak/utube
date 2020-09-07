@@ -53,4 +53,6 @@ public interface MediaFileRepo extends JpaRepository<MediaFile, Integer> {
     @Query(value = "update media_file set views = ?1 where id = ?2",nativeQuery = true)
     void updateViews(int i, int id);
 
+    @Query(value = "select * from media_file where owner=?1",nativeQuery = true)
+    List<MediaFile> myvideos(String email);
 }

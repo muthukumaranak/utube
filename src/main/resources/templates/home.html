@@ -139,18 +139,20 @@
     <a th:href="@{/}">Home</a>
     <a th:href="@{/trending}">Trending</a>
 
-
     <!-- write if else condition to show this (if has channel show my channel else create channel-->
-    <a th:href="@{/create}">Create Channel</a>
-    <a th:href="@{/mychannel}">My Channel</a>
-
+    <span th:if="${hasChannel == 'false'}">
+        <a th:if="${sessionUser != null}" th:href="@{/create}">Create Channel</a> </span>
+     <span th:if="${hasChannel == 'true'}">
+         <a th:if="${sessionUser != null}" th:href="@{/postvideo}">Upload</a>
+    <a th:if="${sessionUser != null}" th:href="@{/mychannel}">My Channel</a>
+    </span>
 
     <!-- write if condition to show this only if logged in-->
-    <a th:href="@{/mylibrary}">My Library</a>
-    <a th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
+    <a th:if="${sessionUser != null}" th:href="@{/mylibrary}">My Library</a>
+    <a  th:if="${sessionUser != null}" th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
     <!-- else -->
-    <a th:href="@{/loginpage}">Login</a>
-    <a th:href="@{/signIn}">Sign Up</a>
+    <a th:if="${sessionUser == null}" th:href="@{/loginpage}">Login</a>
+    <a th:if="${sessionUser == null}" th:href="@{/signIn}">Sign Up</a>
 
     <div>
         <form action="#" style="display:block; float:right;"
@@ -181,8 +183,6 @@
     </div>
 </div>
 
-
-
 <!-- Header -->
 
 
@@ -198,6 +198,7 @@
             <div class="card">
                 <h2 th:text="${temp.owner}"></h2>
                 <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
+                <h5 th:text="'Duration '+${temp.duration}"></h5>
                 <div>
                     <video style="width:100%;" th:src="@{${temp.videoUrl}}" controls></video>
                 </div>

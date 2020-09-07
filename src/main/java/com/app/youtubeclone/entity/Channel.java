@@ -3,7 +3,7 @@ package com.app.youtubeclone.entity;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "channels")
+@Table(name = "channels", uniqueConstraints = @UniqueConstraint(columnNames = "owner"))
 public class Channel {
 
     @Id
@@ -23,7 +23,7 @@ public class Channel {
     private int videos;
 
     @Column(name = "owner")
-    private String owner = "admin";
+    private String owner;
 
     @Column(name = "coverUrl")
     private String coverUrl;
@@ -34,11 +34,12 @@ public class Channel {
     public Channel() {
     }
 
-    public Channel(String channel, String description, String coverUrl, String createdAt) {
+    public Channel(String channel, String description, String coverUrl, String createdAt, String owner) {
         this.channel = channel;
         this.description = description;
         this.coverUrl = coverUrl;
         this.createdAt = createdAt;
+        this.owner = owner;
     }
 
 

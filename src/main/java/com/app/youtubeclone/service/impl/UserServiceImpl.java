@@ -30,6 +30,9 @@ public class UserServiceImpl implements UserService {
         this.usersRepo = usersRepo;
     }
 
+    public UserServiceImpl() {
+    }
+
     @Override
     public Users save(Users users) {
         Users user = new Users(users.getName(),users.getEmail(),
@@ -41,16 +44,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public String register(String name, String email, String password) {
-       /* try{
-            Users users = new Users(name,email,bCryptPasswordEncoder.encode(password));
-            MyUserDetailService myUserDetailService = null;
-            myUserDetailService.save(users);
-            System.out.println(users.getEmail());
-            return "home";
-        }catch (Exception e){
-            return "home";
-        }  */
-
         try {
             Users users = new Users(name,email,bCryptPasswordEncoder.encode(password));
             users.setRole("user");
@@ -64,18 +57,18 @@ public class UserServiceImpl implements UserService {
         return "home";
     }
 
+    public String loginerror(){
+        return "redirect:/";
+    }
+
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        System.out.println("inside save method");
         Users user = usersRepo.findByEmail(email);
-        System.out.println(user.getEmail());
-        System.out.println("inside save method 2");
         if(user == null){
-            System.out.println("if blocked");
-            throw  new UsernameNotFoundException("User does not exist");
+            System.out.println("Wrong Credentials");
+            loginerror();
         }
-        System.out.println("ud called");
         return new User(user.getEmail(),user.getPassword(),mapRolesToAuthorities(user));
     }
     private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Users users){

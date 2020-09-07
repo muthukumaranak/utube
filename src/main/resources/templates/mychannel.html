@@ -167,20 +167,20 @@
 
 </style>
 
-<body>
+<body th:each="temp:${channel}">
 
-<div class="topcontainer">
-    <h1>Channel Name</h1>
+<div class="topcontainer" >
+    <h1 th:text="${temp.channel}"></h1>
     <div class="cover">
-        <img src="https://i.pinimg.com/originals/e4/02/59/e4025992f83181ef484b3244aaf21252.jpg" alt="">
+        <img th:src="@{${temp.coverUrl}}" alt="">
     </div>
     <hr>
-    <p>Description about channel</p>
-    <p>10000 Happy Subscribers &nbsp;<i class="fa fa-users" aria-hidden="true"style="color:black;"></i> </p>
+    <p th:text="${temp.description}"></p>
+    <p><i th:text="'  '+${temp.subscribers} + '  Subscribers'" class="fa fa-users" style="color:black;"></i></p>
     <p>1k Views <i class="fa fa-eye"></i></p>
     <form action="/editchannel" method="post">
         <button type="submit" style="margin-left: 20px;">Edit Channel</button>
-        <a href="/home"><button type="button" class="floatr">Home Page</button></a>
+        <a href="/"><button type="button" class="floatr">Home Page</button></a>
     </form>
     <hr>
 </div>
@@ -198,6 +198,7 @@
             <div class="card">
                 <h2 th:text="${temp.owner}"></h2>
                 <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
+                <h5 th:text="'Duration '+${temp.duration}"></h5>
                 <div class="video">
                     <video th:src="@{${temp.videoUrl}}" controls></video>
                 </div>
@@ -231,6 +232,11 @@
                         <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
                         <div th:each="temp2:${temp.mediaComment}">
                             <li th:text="${temp2.commentby} + ' : '+${temp2.comment}"></li>
+                            <form action="/deletecomment" method="post">
+                                <input type="hidden" th:value="${temp2.id}" name="id"/>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <input type="submit" value="Delete This Comment">
+                            </form>
                         </div>
 
                     </details>
