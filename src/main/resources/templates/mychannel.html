@@ -210,6 +210,11 @@
                 <form action="/editVideo" method="post">
                     <button type="submit">Edit Description</button>
                 </form>
+                <form action="/deletevideo" method="post">
+                    <input type="hidden" th:value="${temp.id}" name="id"/>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit">Delete This Video</button>
+                </form>
             </div>
 
         </div>

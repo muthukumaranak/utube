@@ -2,6 +2,7 @@ package com.app.youtubeclone.entity;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "media_file")
@@ -51,8 +52,10 @@ public class MediaFile {
     private String duration;
 
 
-    @OneToMany(mappedBy = "mediaComment", fetch = FetchType.EAGER, cascade = CascadeType.ALL,orphanRemoval = true, targetEntity = MediaComment.class)
+    @OneToMany(mappedBy = "mediaComment", orphanRemoval = true, cascade = CascadeType.PERSIST)
+   // @OneToMany(mappedBy = "mediaComment", fetch = FetchType.EAGER, cascade = CascadeType.ALL,orphanRemoval = true, targetEntity = MediaComment.class)
     private List<MediaComment> mediaComment;
+
 
     public MediaFile() {
     }

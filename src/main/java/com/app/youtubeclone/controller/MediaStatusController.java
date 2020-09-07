@@ -80,6 +80,6 @@ public class MediaStatusController {
             list.add(mediaFileDTO);
         });
         model.addAttribute("list",list);
-        return "ssss";
+        return "home";
     }
 }

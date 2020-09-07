@@ -364,5 +364,21 @@ public class HomeController {
         return "redirect:/mychannel";
     }
 
+    @PostMapping("/deletemycomment")
+    public String deletemyComment(@RequestParam int id){
+        System.err.println(id);
+        commentService.deleteCommentById(id);
+        return "redirect:/";
+    }
+
+
+
+    @PostMapping("/deletevideo")
+    public String deletevideo(@RequestParam int id){
+        System.err.println(id);
+        mediaService.deletevideo(id);
+        return "redirect:/mychannel";
+    }
+
 }
 

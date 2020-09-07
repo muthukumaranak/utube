@@ -218,12 +218,17 @@
                 <div class="thumb">
                     <img th:src="@{${temp.thumbnailUrl}}" alt="">
                 </div>
-                <div class="content">
+                <!--  for logged in users  -->
+                <div class="content" th:if="${sessionUser != null}">
                     <form action="/like" method="post">
+                        <input type="hidden" th:value="${temp.id}" name="id"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit">
                             <i class="fas fa-thumbs-up" th:text="'  '+${temp.likes}" style="font-size:20px;"></i></button>
                     </form>
                     <form action="/dislike" method="post">
+                        <input type="hidden" th:value="${temp.id}" name="id"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <button type="submit">
                             <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i> </button>
                     </form>
@@ -232,12 +237,46 @@
                         <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
                         <div th:each="temp2:${temp.mediaComment}">
                             <li th:text="${temp2.commentby} + ' : '+${temp2.comment}"></li>
+                            <form action="/deletemycomment" method="post" th:if="${sessionUser} == ${temp2.commentby}">
+                                <input type="hidden" th:value="${temp2.id}" name="id"/>
+                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                <button type="submit">Delete Comment</button>
+                            </form>
                         </div>
+                    </details>
+                    <form action="/comment" method="post">
+                        <input type="hidden" th:value="${temp.id}" name="id"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <textarea name="comment"></textarea> <br>
+                        <button type="submit">Add Comment</button>
+                    </form>
+                </div>
 
+                <!-- for guest-->
+                <div class="content" th:if="${sessionUser == null}">
+                    <form action="/like" method="post">
+                        <input type="hidden" th:value="${temp.id}" name="id"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" disabled>
+                            <i class="fas fa-thumbs-up" th:text="'  '+${temp.likes}" style="font-size:20px;"></i></button>
+                    </form>
+                    <form action="/dislike" method="post">
+                        <input type="hidden" th:value="${temp.id}" name="id"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" disabled>
+                            <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i> </button>
+                    </form>
+
+                    <details>
+                        <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
+                        <div th:each="temp2:${temp.mediaComment}">
+                            <li th:text="${temp2.commentby} + ' : '+${temp2.comment}"></li>
+                        </div>
                     </details>
                     <textarea></textarea> <br>
-                    <button>Add Comment</button>
+                    <button disabled>Add Comment</button>
                 </div>
+                <!-- for guest -->
             </div>
         </div>
     </div>

@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
                 bCryptPasswordEncoder.encode(users.getPassword()));
         user.setRole(user.getRole());
         user.setStatus(user.getStatus());
-
         return usersRepo.save(user);
     }
 
@@ -54,7 +53,7 @@ public class UserServiceImpl implements UserService {
             System.out.println(e);
             return "negative";
         }
-        return "home";
+        return "redirect:/";
     }
 
     public String loginerror(){

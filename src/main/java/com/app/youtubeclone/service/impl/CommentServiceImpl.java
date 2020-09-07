@@ -6,6 +6,8 @@ import com.app.youtubeclone.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class CommentServiceImpl implements CommentService {
 
@@ -19,6 +21,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteCommentById(int commentId) {
-        mediaCommentRepo.deleteById(commentId);
+        Optional<MediaComment> mediaComment = mediaCommentRepo.findById(commentId);
+        mediaCommentRepo.delete(mediaComment.get());
     }
 }

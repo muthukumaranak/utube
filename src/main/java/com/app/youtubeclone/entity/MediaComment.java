@@ -2,7 +2,6 @@ package com.app.youtubeclone.entity;
 
 import javax.persistence.*;
 
-
 @Entity
 @Table(name = "media_comment")
 public class MediaComment {

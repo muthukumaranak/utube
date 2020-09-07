@@ -17,4 +17,6 @@ public interface MediaService {
     String dislike(String id);
 
     String views(int parseInt);
+
+    void deletevideo(int id);
 }
