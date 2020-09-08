@@ -19,6 +19,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Controller
@@ -327,13 +331,13 @@ public class HomeController {
     public String watchLater(@RequestParam("id")int id) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Users users = usersRepo.findByEmail(auth.getName());
+        mediaFileRepo.findById(id).get().setSaved(true);
         Library library = new Library();
         library.setUserId(users.getId());
         library.setVideoId(id);
         libraryRepo.save(library);
         return "redirect:/";
     }
-
 
     @GetMapping("/savedVideo")
     public String savedVideo(@RequestParam("userId") int userId, Model model) {
@@ -390,6 +394,7 @@ public class HomeController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Users users = usersRepo.findByEmail(auth.getName());
         List<MediaFile> mediaFiles = mediaFileRepo.findvideo(id);
+        mediaService.views(id+1);
         List<MediaFile> list = new LinkedList<>();
         mediaFiles.forEach(video -> {
             MediaFile mediaFileDTO = new MediaFile();
@@ -442,8 +447,28 @@ public class HomeController {
             model.addAttribute("sessionId",users.getId());
             model.addAttribute("hasChannel",users.getStatus());
         }
-        return "home";
+        return "redirect:/myLibrary";
     }
+
+    @PostMapping("/public")
+    public String topublic(@RequestParam int id){
+        mediaFileRepo.topublic(id);
+        return "redirect:/mychannel";
+    }
+
+    @PostMapping("/private")
+    public String toprivate(@RequestParam int id){
+        mediaFileRepo.toprivate(id);
+        return "redirect:/mychannel";
+    }
+
+    @GetMapping("/mysubscriptions")
+    public String mysubscriptions(Model model){
+        List<Channel> channels = channelRepo.findAll();
+        model.addAttribute("list",channels);
+        return "subscriptions";
+    }
+
 
 }
 

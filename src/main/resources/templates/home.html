@@ -144,6 +144,7 @@ border: 0.5px solid #black;
 
     <!-- write if condition to show this only if logged in-->
     <a th:if="${sessionUser != null}" th:href="@{/myLibrary}">My Library</a>
+    <a th:if="${sessionUser != null}" th:href="@{/mysubscriptions}">Subscriptions</a>
     <a th:if="${sessionUser != null}" th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
     <!-- else -->
     <a th:if="${sessionUser == null}" th:href="@{/loginpage}">Login</a>
@@ -170,7 +171,7 @@ border: 0.5px solid #black;
         <span th:unless="${currentPage > 1}">Prev</span>
         <span th:each="i: ${#numbers.sequence(1, totalPages)}">&nbsp;<a th:if="${currentPage != i}"
                                                                         th:href="@{'/page/' + ${i}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">[[${i}]]</a>
-                    <span th:unless="${currentPage != i}">[[${i}]]</span>  &nbsp;
+                    <span th:unless="${currentPage != i}" style="color: red; font-size: 20px;">[[${i}]]</span>  &nbsp;
                 </span> &nbsp;
         <a th:if="${currentPage < totalPages}"
            th:href="@{'/page/' + ${currentPage + 1}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">Next</a>
@@ -183,10 +184,11 @@ border: 0.5px solid #black;
 <!-- main content goes here , If condition-->
 <div class="thumb" th:if="${sessionUser != null}">
     <!-- For starts here -->
-    <div class="video" th:each="temp:${list}">
+    <div th:each="temp:${list}">
+        <div class="video" th:if="${temp.visibility != 'Private'}">
         <h3 th:text="${temp.title}"></h3>
         <h5 th:text="'Posted on '+${temp.createdAt}+' by '+${temp.owner}"></h5>
-        <h5 th:text="'Play Time : '+${temp.duration}"></h5>
+        <h5 th:text="'Play Time : '+${temp.duration}+' Total Views: '+${temp.views}"></h5>
                 <img th:src="@{${temp.thumbnailUrl}}" alt="">
         <form action="/videopage" method="post">
             <input type="hidden" th:value="${temp.id}" name="id"/>
@@ -208,14 +210,15 @@ border: 0.5px solid #black;
             <button type="submit">
                 <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i></button>
         </form>
-        <form id="myform" th:action="@{/watchLater(id=${temp.id})}" th:object="${temp}" method="post">
-            <input th:if="${sessionUser != null} and ${temp.saved != true}" type="submit" name="watchLater" id="watchLater"
-                   value="Add to Watch Later" >
-        </form>
-        <form  th:action="@{/removeSaved(id=${temp.id})}" th:object="${temp}" method="post">
-            <input th:if="${sessionUser != null} and ${temp.saved == true}" type="submit" name="watchLater" id="removeSaved"
-                   value="Remove from Watch Later" >
-        </form>
+            <form id="myform" th:action="@{/watchLater(id=${temp.id})}" th:object="${temp}" method="post">
+                <button th:if="${sessionUser != null and temp.saved != true}" type="submit" name="watchLater" id="watchLater"
+                >Add to Watch Later</button>
+            </form>
+            <form  th:action="@{/removeSaved(id=${temp.id})}" th:object="${temp}" method="post">
+                <button th:if="${sessionUser != null and temp.saved == true}" type="submit" name="removeSaved" id="removeSaved"
+                >Remove from Watch Later</button>
+            </form>
+        </div>
     </div>
 
 </div><!-- main content goes here -->
@@ -224,10 +227,11 @@ border: 0.5px solid #black;
 <!-- Guest goes here , If condition-->
 <div class="thumb" th:if="${sessionUser == null}">
     <!-- For starts here -->
-    <div class="video" th:each="temp:${list}">
+    <div th:each="temp:${list}">
+        <div class="video" th:if="${temp.visibility != 'Private'}">
         <h3 th:text="${temp.title}"></h3>
         <h5 th:text="'Posted on '+${temp.createdAt}+' by '+${temp.owner}"></h5>
-        <h5 th:text="'Play Time : '+${temp.duration}"></h5>
+        <h5 th:text="'Play Time : '+${temp.duration}+' Total Views: '+${temp.views}"></h5>
         <img th:src="@{${temp.thumbnailUrl}}" alt="">
         <form action="/videopage" method="post">
             <input type="hidden" th:value="${temp.id}" name="id"/>
@@ -249,7 +253,7 @@ border: 0.5px solid #black;
             <button type="submit" disabled>
                 <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i></button>
         </form>
-
+        </div>
     </div>
 
 </div><!-- main content goes here -->

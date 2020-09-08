@@ -43,7 +43,7 @@ public class MediaStatusController {
 
     @PostMapping("/views")
     public String views(@RequestParam String id){
-        return mediaService.views(Integer.parseInt(id));
+        return mediaService.views(Integer.parseInt(id)+1);
     }
 
     @GetMapping("/receiveall")

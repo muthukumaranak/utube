@@ -22,12 +22,8 @@ public interface MediaFileRepo extends JpaRepository<MediaFile, Integer> {
     @Query("SELECT m FROM MediaFile m WHERE m.tag LIKE %?1%")
     Page<MediaFile> filterByTag(String tag, Pageable pageable);
 
+    @Query(value = "SELECT * from media_file ORDER BY views DESC",nativeQuery = true)
     List<MediaFile> findTop2ByOrderByViewsDesc();
-
-
-    //@Query("SELECT m FROM MediaFile m WHERE m.watchLater = :true")
-    //List<MediaFile> findAllWatchLater();
-
 
     @Query(value = "select likes from media_file where id=?1", nativeQuery = true)
     int findLikes(int parseInt);
@@ -35,15 +31,15 @@ public interface MediaFileRepo extends JpaRepository<MediaFile, Integer> {
     @Transactional
     @Modifying
     @Query(value = "update media_file set likes = ?1 where id = ?2",nativeQuery = true)
-    void updateLikes(int total_likes, int parseInt);
+    void updateLikes(int total_likes, int id);
 
     @Query(value = "select dislikes from media_file where id=?1", nativeQuery = true)
-    int findDisLikes(int parseInt);
+    int findDisLikes(int id);
 
     @Transactional
     @Modifying
     @Query(value = "update media_file set dislikes = ?1 where id = ?2",nativeQuery = true)
-    void updateDisLikes(int i, int parseInt);
+    void updateDisLikes(int i, int id);
 
     @Query(value = "select views from media_file where id=?1", nativeQuery = true)
     int findViews(int id);
@@ -59,4 +55,16 @@ public interface MediaFileRepo extends JpaRepository<MediaFile, Integer> {
 
     @Query(value = "select * from media_file where id = ?1",nativeQuery = true)
     List<MediaFile> findvideo(int id);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = "update media_file set visibility='Public' where id =?1",nativeQuery = true)
+    void topublic(int id);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = "update media_file set visibility='Private' where id =?1",nativeQuery = true)
+    void toprivate(int id);
 }

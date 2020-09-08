@@ -53,6 +53,7 @@ public class AwsServiceImpl implements AwsService {
             SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
             String created_at = f.format(new Date());
 
+            saved = false;
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Users users = usersRepo.findByEmail(auth.getName());
             MediaFile mediaFile = new MediaFile(title, description, tags, restriction, created_at, visibility, thumbnailurl, videourl,

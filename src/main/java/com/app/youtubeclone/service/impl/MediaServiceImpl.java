@@ -97,7 +97,9 @@ public class MediaServiceImpl implements MediaService {
     public String views(int id) {
         try{
             int total_views = mediaFileRepo.findViews(id);
+            System.err.println(total_views);
             mediaFileRepo.updateViews(total_views+1,id);
+            System.err.println("views increased");
             return "View Increased";
         }catch (Exception e){
             System.out.println(e);
