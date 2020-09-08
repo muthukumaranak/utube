@@ -33,9 +33,10 @@ public class AwsServiceImpl implements AwsService {
 
     @Value("${amazonProperties.bucketName}")
     private String bucketName;
+
     @Override
     public void upload(String title, String description, String tags, String restriction,
-                       String visibility, MultipartFile thumbnail, MultipartFile video,String duration) {
+                       String visibility, MultipartFile thumbnail, MultipartFile video,String duration, Boolean saved) {
         try {
             String thumbnailOriginalFilename = thumbnail.getOriginalFilename();
             String videoOriginalFilename = video.getOriginalFilename();
@@ -55,7 +56,7 @@ public class AwsServiceImpl implements AwsService {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             Users users = usersRepo.findByEmail(auth.getName());
             MediaFile mediaFile = new MediaFile(title, description, tags, restriction, created_at, visibility, thumbnailurl, videourl,
-                    users.getEmail(),duration);
+                    users.getEmail(),duration, saved);
             mediaFileRepo.save(mediaFile);
 
 

@@ -37,7 +37,7 @@ public class MediaFile {
     private String videoUrl;
 
     @Column(name = "owner")
-    private String owner = "admin";
+    private String owner;
 
     @Column(name = "likes")
     private Integer likes = 0;
@@ -51,6 +51,17 @@ public class MediaFile {
     @Column(name = "duration")
     private String duration;
 
+    @Column(name = "saved")
+    private Boolean saved = false;
+
+    public Boolean getSaved() {
+        return saved;
+    }
+
+    public void setSaved(Boolean saved) {
+        this.saved = saved;
+    }
+
 
     @OneToMany(mappedBy = "mediaComment", orphanRemoval = true, cascade = CascadeType.PERSIST)
    // @OneToMany(mappedBy = "mediaComment", fetch = FetchType.EAGER, cascade = CascadeType.ALL,orphanRemoval = true, targetEntity = MediaComment.class)
@@ -60,7 +71,8 @@ public class MediaFile {
     public MediaFile() {
     }
 
-    public MediaFile(String title, String description, String tag, String restriction, String createdAt, String visibility, String thumbnailUrl, String videoUrl, String owner,String duration) {
+
+    public MediaFile(String title, String description, String tag, String restriction, String createdAt, String visibility, String thumbnailUrl, String videoUrl, String owner, String duration, boolean saved) {
 
         this.title = title;
         this.description = description;

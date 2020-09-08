@@ -1,0 +1,106 @@
+
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<style>
+body{
+margin: 20px;
+font-size: 20px;
+background: #f3f3f3;}
+.header{
+background: #212121;}
+
+.header button{
+padding: 10px;
+margin: 15px;
+background: #212121;
+border: none;}
+
+.header button a:hover{
+background: white;
+color: #212121;}
+
+a{
+text-decoration: none;
+color: white;
+padding: 10px;}
+
+.video{
+padding: 20px;
+margin: 20px; }
+
+details, textarea{
+margin-top: 20px;
+margin-bottom: 20px;}
+
+
+</style>
+<body>
+
+<div class="header">
+    <button>
+        <a href="/">Back to Home</a>
+    </button> </div> <br>
+
+<div th:if="${sessionUser != null}">
+<div class="video" th:each="temp:${list}">
+    <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
+        <video style="width:50%;" th:src="@{${temp.videoUrl}}" controls></video>
+    <p>Video Description</p>
+    <p th:text="${temp.description}"></p>
+    <button type="submit">
+        <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
+    </button>
+    <details>
+        <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
+        <div th:each="temp2:${temp.mediaComment}">
+            <li th:text="${temp2.commentby} + ' : '+${temp2.comment}"></li>
+            <form action="/deletemycomment" method="post" th:if="${sessionUser} == ${temp2.commentby}">
+                <input type="hidden" th:value="${temp2.id}" name="id"/>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit">Delete Comment</button>
+            </form>
+        </div>
+    </details>
+    <form action="/comment" method="post">
+        <input type="hidden" th:value="${temp.id}" name="id"/>
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <textarea name="comment"></textarea>  <br>
+        <button type="submit">Add Comment</button>
+    </form>
+</div>
+</div>
+
+<!-- guest-->
+
+<div th:if="${sessionUser == null}">
+    <div class="video" th:each="temp:${list}">
+        <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
+            <video style="width:50%;" th:src="@{${temp.videoUrl}}" controls></video>
+        <p>Video Description</p>
+        <p th:text="${temp.description}"></p>
+        <button type="submit">
+            <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
+        </button>
+        <details>
+            <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
+            <div th:each="temp2:${temp.mediaComment}">
+                <li th:text="${temp2.commentby} + ' : '+${temp2.comment}"></li>
+                <form action="/deletemycomment" method="post" th:if="${sessionUser} == ${temp2.commentby}">
+                    <input type="hidden" th:value="${temp2.id}" name="id"/>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                </form>
+            </div>
+        </details>
+    </div>
+</div>
+
+
+</body>
+</html>
+
+
+
+
+
+
+

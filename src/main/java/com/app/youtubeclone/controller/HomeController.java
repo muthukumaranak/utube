@@ -19,10 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Controller
 public class HomeController {
@@ -140,6 +137,7 @@ public class HomeController {
             mediaFileDTO.setDislikes(video.getDislikes());
             mediaFileDTO.setViews(video.getViews());
             mediaFileDTO.setDuration(video.getDuration());
+            mediaFileDTO.setSaved(video.getSaved());
             List<MediaComment> commentDTOS = new LinkedList();
             video.getMediaComment().forEach(comment -> {
                 MediaComment commentDTO = new MediaComment();
@@ -186,6 +184,7 @@ public class HomeController {
             mediaFileDTO.setDislikes(video.getDislikes());
             mediaFileDTO.setViews(video.getViews());
             mediaFileDTO.setDuration(video.getDuration());
+            mediaFileDTO.setSaved(video.getSaved());
             List<MediaComment> commentDTOS = new LinkedList();
             video.getMediaComment().forEach(comment -> {
                 MediaComment commentDTO = new MediaComment();
@@ -243,6 +242,7 @@ public class HomeController {
             mediaFileDTO.setDislikes(video.getDislikes());
             mediaFileDTO.setViews(video.getViews());
             mediaFileDTO.setDuration(video.getDuration());
+            mediaFileDTO.setSaved(video.getSaved());
             List<MediaComment> commentDTOS = new LinkedList();
             video.getMediaComment().forEach(comment -> {
                 MediaComment commentDTO = new MediaComment();
@@ -296,6 +296,7 @@ public class HomeController {
             mediaFileDTO.setDislikes(video.getDislikes());
             mediaFileDTO.setViews(video.getViews());
             mediaFileDTO.setDuration(video.getDuration());
+            mediaFileDTO.setSaved(video.getSaved());
             List<MediaComment> commentDTOS = new LinkedList();
             video.getMediaComment().forEach(comment -> {
                 MediaComment commentDTO = new MediaComment();
@@ -330,27 +331,9 @@ public class HomeController {
         library.setUserId(users.getId());
         library.setVideoId(id);
         libraryRepo.save(library);
-        return "home";
-    }
-
-    @GetMapping("/setWatchLater/{id}")
-    public String setWatchLater(@ModelAttribute("mediaComment") MediaComment comment, Model model, @PathVariable("id")
-            int mediaId, @ModelAttribute("mediaFiles") MediaFile mediaFiles) {
-        MediaFile mediaFile = mediaFileRepo.findById(mediaId).get();
-        model.addAttribute("mediaComment", comment);
-        model.addAttribute("mediaFiles", mediaFiles);
-        return "redirect:/";
-
-    }
-
-    @GetMapping("/watchLater/{userId}/{mediaId}")
-    public String watchLater(@RequestParam("userId") int userId, @RequestParam("mediaId") int mediaId, Model model) {
-        Library library = new Library();
-        library.setUserId(userId);
-        library.setVideoId(mediaId);
-        libraryRepo.save(library);
         return "redirect:/";
     }
+
 
     @GetMapping("/savedVideo")
     public String savedVideo(@RequestParam("userId") int userId, Model model) {
@@ -400,6 +383,66 @@ public class HomeController {
         System.err.println(id);
         mediaService.deletevideo(id);
         return "redirect:/mychannel";
+    }
+
+    @PostMapping("/videopage")
+    public String videopage(Model model, @RequestParam int id){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        List<MediaFile> mediaFiles = mediaFileRepo.findvideo(id);
+        List<MediaFile> list = new LinkedList<>();
+        mediaFiles.forEach(video -> {
+            MediaFile mediaFileDTO = new MediaFile();
+            mediaFileDTO.setTitle(video.getTitle());
+            mediaFileDTO.setDescription(video.getDescription());
+            mediaFileDTO.setId(video.getId());
+            mediaFileDTO.setOwner(video.getOwner());
+            mediaFileDTO.setThumbnailUrl(video.getThumbnailUrl());
+            mediaFileDTO.setVideoUrl(video.getVideoUrl());
+            mediaFileDTO.setTag(video.getTag());
+            mediaFileDTO.setRestriction(video.getRestriction());
+            mediaFileDTO.setCreatedAt(video.getCreatedAt());
+            mediaFileDTO.setVisibility(video.getVisibility());
+            mediaFileDTO.setLikes(video.getLikes());
+            mediaFileDTO.setDislikes(video.getDislikes());
+            mediaFileDTO.setViews(video.getViews());
+            mediaFileDTO.setDuration(video.getDuration());
+            mediaFileDTO.setSaved(video.getSaved());
+            List<MediaComment> commentDTOS = new LinkedList();
+            video.getMediaComment().forEach(comment -> {
+                MediaComment commentDTO = new MediaComment();
+                commentDTO.setCommentby(comment.getCommentby());
+                commentDTO.setComment(comment.getComment());
+                commentDTO.setId(comment.getId());
+                commentDTO.setMediaFile(comment.getMediaFile());
+                commentDTO.setCreated_at(comment.getCreated_at());
+                commentDTOS.add(commentDTO);
+            });
+            mediaFileDTO.setMediaComment(commentDTOS);
+            list.add(mediaFileDTO);
+        });
+        model.addAttribute("list", list);
+        if(users != null){
+            model.addAttribute("sessionUser",users.getName());
+            model.addAttribute("sessionId",users.getId());
+            model.addAttribute("hasChannel",users.getStatus());
+        }
+        return "videopage";
+    }
+
+    @PostMapping("/removeSaved")
+    public String removeSaved(Model model, @RequestParam("id")int id ) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        MediaFile mediaFile = mediaFileRepo.findById(id).get();
+        mediaFile.setSaved(false);
+        libraryRepo.deleteLibrary(id, users.getId());
+        if(users != null){
+            model.addAttribute("sessionUser",users.getName());
+            model.addAttribute("sessionId",users.getId());
+            model.addAttribute("hasChannel",users.getStatus());
+        }
+        return "home";
     }
 
 }

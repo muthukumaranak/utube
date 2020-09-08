@@ -25,12 +25,13 @@ public class AwsController {
     private AmazonS3 s3client;
 
 
+
     @PostMapping("/upload")
     public String upload(@RequestParam String title, @RequestParam String description, @RequestParam String tags,
                          @RequestParam("thumbnail") MultipartFile thumbnail, @RequestParam("video") MultipartFile video,
-                         @RequestParam String visibility, @RequestParam String restriction, @RequestParam String duration) {
+                         @RequestParam String visibility, @RequestParam String restriction, @RequestParam String duration,@RequestParam Boolean saved) {
         try {
-            awsService.upload(title, description, tags, restriction, visibility, thumbnail, video,duration);
+            awsService.upload(title, description, tags, restriction, visibility, thumbnail, video,duration,saved);
         } catch (IOException e) {
             e.printStackTrace();
         }

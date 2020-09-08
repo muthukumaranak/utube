@@ -57,4 +57,6 @@ public interface MediaFileRepo extends JpaRepository<MediaFile, Integer> {
     List<MediaFile> myvideos(String email);
 
 
+    @Query(value = "select * from media_file where id = ?1",nativeQuery = true)
+    List<MediaFile> findvideo(int id);
 }
