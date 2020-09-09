@@ -148,7 +148,7 @@
         display: block;
         margin-left: auto;
         margin-right: auto;
-        width: 60%;
+        width: 40%;
         padding-bottom: 20px;
     }
 
@@ -165,6 +165,9 @@
     .floatr a:hover{
     color: white;}
 
+    .video{
+    width: 100%;}
+
 </style>
 
 <body th:each="temp:${channel}">
@@ -178,7 +181,7 @@
     <p th:text="${temp.description}"></p>
     <p><i th:text="'  '+${temp.subscribers} + '  Subscribers'" class="fa fa-users" style="color:black;"></i></p>
     <p>1k Views <i class="fa fa-eye"></i></p>
-    <form action="/editchannel" method="post">
+    <form action="/editchannel" method="get">
         <button type="submit" style="margin-left: 20px;">Edit Channel</button>
         <a href="/"><button type="button" class="floatr">Home Page</button></a>
     </form>
@@ -208,7 +211,9 @@
                     <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
                 </button>
                 <form action="/editVideo" method="post">
-                    <button type="submit">Edit Description</button>
+                    <input type="hidden" th:value="${temp.id}" name="id"/>
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit">Edit Video</button>
                 </form>
                 <form action="/public" method="post" th:if="${temp.visibility=='Private'}">
                     <input type="hidden" th:value="${temp.id}" name="id"/>

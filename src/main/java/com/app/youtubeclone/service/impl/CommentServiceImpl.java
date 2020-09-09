@@ -23,6 +23,7 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public void deleteCommentById(int commentId) {
         Optional<MediaComment> mediaComment = mediaCommentRepo.findById(commentId);
+        System.err.println(mediaComment.get());
         mediaCommentRepo.delete(mediaComment.get());
     }
 }

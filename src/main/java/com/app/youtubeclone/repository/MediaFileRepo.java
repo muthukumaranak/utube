@@ -47,7 +47,7 @@ public interface MediaFileRepo extends JpaRepository<MediaFile, Integer> {
     @Transactional
     @Modifying
     @Query(value = "update media_file set views = ?1 where id = ?2",nativeQuery = true)
-    void updateViews(int i, int id);
+    void updateViews(int views, int id);
 
     @Query(value = "select * from media_file where owner=?1",nativeQuery = true)
     List<MediaFile> myvideos(String email);
@@ -67,4 +67,10 @@ public interface MediaFileRepo extends JpaRepository<MediaFile, Integer> {
     @Modifying
     @Query(value = "update media_file set visibility='Private' where id =?1",nativeQuery = true)
     void toprivate(int id);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = "update media_file set title=?1, description=?2 where id=?3",nativeQuery = true)
+    void updatevideo(String title, String description, int id);
 }

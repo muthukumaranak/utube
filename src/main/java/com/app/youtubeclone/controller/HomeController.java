@@ -9,7 +9,6 @@ import com.app.youtubeclone.service.ChannelService;
 import com.app.youtubeclone.service.CommentService;
 import com.app.youtubeclone.service.MediaService;
 import com.app.youtubeclone.service.UserService;
-import com.app.youtubeclone.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
@@ -19,10 +18,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Controller
@@ -394,7 +389,9 @@ public class HomeController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         Users users = usersRepo.findByEmail(auth.getName());
         List<MediaFile> mediaFiles = mediaFileRepo.findvideo(id);
-        mediaService.views(id+1);
+        MediaFile mediaFile = mediaFileRepo.findById(id).get();
+        int views = mediaFile.getViews();
+        mediaFileRepo.updateViews(views+1,id);
         List<MediaFile> list = new LinkedList<>();
         mediaFiles.forEach(video -> {
             MediaFile mediaFileDTO = new MediaFile();
@@ -469,6 +466,65 @@ public class HomeController {
         return "subscriptions";
     }
 
+    @GetMapping("/editchannel")
+    public String editchannel(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        List<Channel> channels = channelRepo.findByOwner(users.getEmail());
+        model.addAttribute("list",channels);
+        return "channeledit";
+    }
 
+    @PostMapping("/edit")
+    public String edit(@RequestParam String channel, @RequestParam String description){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        channelRepo.update(channel, description, users.getEmail());
+        return "redirect:/mychannel";
+    }
+
+    @PostMapping("/editVideo")
+    public String editvideo(Model model,@RequestParam int id){
+        List<MediaFile> mediaFiles = mediaFileRepo.findvideo(id);
+        List<MediaFile> listDTOS = new LinkedList<>();
+        mediaFiles.forEach(video -> {
+            MediaFile mediaFileDTO = new MediaFile();
+            mediaFileDTO.setTitle(video.getTitle());
+            mediaFileDTO.setDescription(video.getDescription());
+            mediaFileDTO.setId(video.getId());
+            mediaFileDTO.setOwner(video.getOwner());
+            mediaFileDTO.setThumbnailUrl(video.getThumbnailUrl());
+            mediaFileDTO.setVideoUrl(video.getVideoUrl());
+            mediaFileDTO.setTag(video.getTag());
+            mediaFileDTO.setRestriction(video.getRestriction());
+            mediaFileDTO.setCreatedAt(video.getCreatedAt());
+            mediaFileDTO.setVisibility(video.getVisibility());
+            mediaFileDTO.setLikes(video.getLikes());
+            mediaFileDTO.setDislikes(video.getDislikes());
+            mediaFileDTO.setViews(video.getViews());
+            mediaFileDTO.setDuration(video.getDuration());
+            mediaFileDTO.setSaved(video.getSaved());
+            List<MediaComment> commentDTOS = new LinkedList();
+            video.getMediaComment().forEach(comment -> {
+                MediaComment commentDTO = new MediaComment();
+                commentDTO.setCommentby(comment.getCommentby());
+                commentDTO.setComment(comment.getComment());
+                commentDTO.setId(comment.getId());
+                commentDTO.setMediaFile(comment.getMediaFile());
+                commentDTO.setCreated_at(comment.getCreated_at());
+                commentDTOS.add(commentDTO);
+            });
+            mediaFileDTO.setMediaComment(commentDTOS);
+            listDTOS.add(mediaFileDTO);
+        });
+        model.addAttribute("list", listDTOS);
+        return "videoedit";
+    }
+
+    @PostMapping("/editvideo")
+    public String editVideo(@RequestParam String title, @RequestParam String description, @RequestParam int id){
+        mediaFileRepo.updatevideo(title,description,id);
+        return "redirect:/mychannel";
+    }
 }
 
