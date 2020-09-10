@@ -1,34 +1,28 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration</title>
+    <title>User Login</title>
 </head>
 <style>
     body {
         font-family: 'Lucida Sans', 'Lucida Sans Regular';
         background: #232323;
     }
-
     .form {
         background: #f2f2f2;
         width: 50%;
         margin-left: 25%;
         text-align: center;
     }
-
     form {
-
         margin-top: 12%;
         padding: 25px;
     }
-
     label {
         font-weight: bold;
     }
-
     input{
         margin-top: 15px;
         margin-bottom: 15px;
@@ -36,16 +30,12 @@
         width: 80%;
         padding: 10px;
     }
-
-
-
     input[type="submit"],input[type="button"] {
         background: #333333;
         color: whitesmoke;
         width: 80%;
         padding: 10px;
     }
-
     input[type="submit"]:hover {
         color: #333333;
         background: whitesmoke;
@@ -57,14 +47,12 @@ input[type="button"]:hover {
 </style>
 
 <body>
-
 <div class="form">
     <form action="/login" method="post">
         <h2>Login Page</h2>
         <hr>
         <label for="username">E-Mail</label> <br>
         <input type="email" name="username" id="username" placeholder="Enter your E-Mail" required> <br>
-
         <label for="password">Password</label> <br>
         <input type="password" name="password" id="password" placeholder="Enter your password" required> <br>
         <hr>
@@ -75,5 +63,4 @@ input[type="button"]:hover {
     </form>
 </div>
 </body>
-
 </html>

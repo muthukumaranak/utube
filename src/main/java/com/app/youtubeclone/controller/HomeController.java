@@ -526,5 +526,57 @@ public class HomeController {
         mediaFileRepo.updatevideo(title,description,id);
         return "redirect:/mychannel";
     }
+
+
+    @PostMapping("/viewchannel")
+    public String viewchannel(@RequestParam int id, Model model){
+        String owner = channelRepo.findByOwner(id);
+        List<MediaFile> mediaFiles = mediaFileRepo.myvideos(owner);
+        List<MediaFile> list = new LinkedList<>();
+        mediaFiles.forEach(video -> {
+            MediaFile mediaFileDTO = new MediaFile();
+            mediaFileDTO.setTitle(video.getTitle());
+            mediaFileDTO.setDescription(video.getDescription());
+            mediaFileDTO.setId(video.getId());
+            mediaFileDTO.setOwner(video.getOwner());
+            mediaFileDTO.setThumbnailUrl(video.getThumbnailUrl());
+            mediaFileDTO.setVideoUrl(video.getVideoUrl());
+            mediaFileDTO.setTag(video.getTag());
+            mediaFileDTO.setRestriction(video.getRestriction());
+            mediaFileDTO.setCreatedAt(video.getCreatedAt());
+            mediaFileDTO.setVisibility(video.getVisibility());
+            mediaFileDTO.setLikes(video.getLikes());
+            mediaFileDTO.setDislikes(video.getDislikes());
+            mediaFileDTO.setViews(video.getViews());
+            mediaFileDTO.setDuration(video.getDuration());
+            mediaFileDTO.setSaved(video.getSaved());
+            List<MediaComment> commentDTOS = new LinkedList();
+            video.getMediaComment().forEach(comment -> {
+                MediaComment commentDTO = new MediaComment();
+                commentDTO.setCommentby(comment.getCommentby());
+                commentDTO.setComment(comment.getComment());
+                commentDTO.setId(comment.getId());
+                commentDTO.setMediaFile(comment.getMediaFile());
+                commentDTO.setCreated_at(comment.getCreated_at());
+                commentDTOS.add(commentDTO);
+            });
+            mediaFileDTO.setMediaComment(commentDTOS);
+            list.add(mediaFileDTO);
+        });
+        model.addAttribute("list", list);
+        List<Channel> channelList = channelRepo.findById(id);
+        List<Channel> channels = new LinkedList<>();
+        channelList.forEach(channelcontent -> {
+            Channel channel = new Channel();
+            channel.setChannel(channelcontent.getChannel());
+            channel.setCoverUrl(channelcontent.getCoverUrl());
+            channel.setDescription(channelcontent.getDescription());
+            channel.setSubscribers(channelcontent.getSubscribers());
+            channel.setCreatedAt(channelcontent.getCreatedAt());
+            channels.add(channel);
+        });
+        model.addAttribute("channel",channels);
+        return "channel";
+    }
 }
 

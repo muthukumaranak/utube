@@ -19,4 +19,10 @@ public interface ChannelRepo extends JpaRepository<Channel, Long> {
     @Modifying
     @Query(value = "update channels set channel=?1, description = ?2 where owner=?3",nativeQuery = true)
     void update(String channel, String description, String owner);
+
+    @Query(value = "select * from channels where id=?1",nativeQuery = true)
+    List<Channel> findById(int id);
+
+    @Query(value = "select owner from channels where id=?1",nativeQuery = true)
+    String findByOwner(int id);
 }

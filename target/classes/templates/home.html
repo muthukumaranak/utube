@@ -23,42 +23,6 @@
             background: #131313;
         }
 
-        .leftcolumn {
-            float: left;
-            width: 50%;
-        }
-
-        .rightcolumn {
-            float: left;
-            width: 50%;
-            padding-left: 20px;
-        }
-
-        .video{
-            background: #131313;
-            width:40%;
-            padding: 20px;
-        }
-
-        .thumb img{
-            background: #131313;
-            width: 40%;
-            padding: 20px;
-        }
-
-
-        .card {
-            background: #131313;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .row:after {
-            content: "";
-            display: table;
-            clear: both;
-        }
-
         .header{
             text-align:center;
             font-size:30px;
@@ -80,24 +44,8 @@
             background: #232323;
         }
 
-        .content p {
-            display: inline-block;
-            margin-right: 25px;
-        }
 
-        .content {
-            margin-left: 10%;
-        }
 
-        textarea {
-            width: 90%;
-            background: #f4f4f4;
-            margin-top: 20px;
-        }
-
-        details {
-            margin-top: 15px;
-        }
 
         .topnav {
               display:flex;
@@ -127,6 +75,53 @@
          text-decoration: none;
          color: white;}
 
+
+.content{
+margin: 20px;}
+.header button{
+padding: 10px;
+margin: 15px;
+background: #212121;
+border: none;}
+
+.header button a:hover{
+background: white;
+color: #212121;}
+
+a{
+text-decoration: none;
+color: white;
+padding: 10px;}
+
+.thumb{
+background: #f2f2f2;
+color: black;
+display: flex;
+flex-wrap: wrap;
+}
+
+.video img{
+width: 300px;
+height: 180px;
+}
+
+.video{
+background: #f4f4f4;
+border: 0.5px solid #black;
+  box-shadow: 1px 1px 2px 2px;
+  padding: 20px;
+  margin: 20px;}
+
+  .video button{
+  background: #242424;
+  color: white;
+  margin-right: 25px;
+  border: none;
+  padding: 15px;}
+
+
+
+
     </style>
 </head>
 
@@ -139,18 +134,21 @@
     <a th:href="@{/}">Home</a>
     <a th:href="@{/trending}">Trending</a>
 
-
     <!-- write if else condition to show this (if has channel show my channel else create channel-->
-    <a th:href="@{/create}">Create Channel</a>
-    <a th:href="@{/mychannel}">My Channel</a>
+
+        <a th:if="${hasChannel == 'false'} and ${sessionUser != null}" th:href="@{/create}">Create Channel</a>
+
+         <a th:if="${sessionUser != null} and ${hasChannel == 'true'}" th:href="@{/postvideo}">Upload</a>
+        <a th:if="${sessionUser != null} and ${hasChannel == 'true'}" th:href="@{/mychannel}">My Channel</a>
 
 
     <!-- write if condition to show this only if logged in-->
-    <a th:href="@{/mylibrary}">My Library</a>
-    <a th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
+    <a th:if="${sessionUser != null}" th:href="@{/myLibrary}">My Library</a>
+    <a th:if="${sessionUser != null}" th:href="@{/mysubscriptions}">Subscriptions</a>
+    <a th:if="${sessionUser != null}" th:href="@{/logout}" sec:authorize="isAuthenticated()">Logout</a>
     <!-- else -->
-    <a th:href="@{/loginpage}">Login</a>
-    <a th:href="@{/signIn}">Sign Up</a>
+    <a th:if="${sessionUser == null}" th:href="@{/loginpage}">Login</a>
+    <a th:if="${sessionUser == null}" th:href="@{/signIn}">Sign Up</a>
 
     <div>
         <form action="#" style="display:block; float:right;"
@@ -158,7 +156,7 @@
             <input type="hidden" name="sortField" th:value="${sortField}">
             <input type="hidden" name="sortDirection" th:value="${sortDirection}">
             <input type="text" placeholder="Keyword.." name="keyword">
-            <button  type="submit" value="Search">Search</button>
+            <button type="submit" value="Search">Search</button>
         </form>
     </div>
     <!--    <a th:href="@{/watchLater}">Trending</a>-->
@@ -173,7 +171,7 @@
         <span th:unless="${currentPage > 1}">Prev</span>
         <span th:each="i: ${#numbers.sequence(1, totalPages)}">&nbsp;<a th:if="${currentPage != i}"
                                                                         th:href="@{'/page/' + ${i}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">[[${i}]]</a>
-                    <span th:unless="${currentPage != i}">[[${i}]]</span>  &nbsp;
+                    <span th:unless="${currentPage != i}" style="color: red; font-size: 20px;">[[${i}]]</span>  &nbsp;
                 </span> &nbsp;
         <a th:if="${currentPage < totalPages}"
            th:href="@{'/page/' + ${currentPage + 1}+ '?sortField=' + ${sortField} + '&sortDirection=' + ${sortDirection} + ${keyword != null ? '&keyword=' + keyword : ''} + ${tag != null ? '&tag=' + tag : ''}}">Next</a>
@@ -181,67 +179,85 @@
     </div>
 </div>
 
-
-
 <!-- Header -->
-
-
-<!-- First blog-->
-<div class="flow" th:each="temp:${list}">
-    <br>
-    <div class="header">
-        <h2 th:text="${temp.title}"></h2>
-    </div>
-
-    <div class="row">
-        <div class="leftcolumn">
-            <div class="card">
-                <h2 th:text="${temp.owner}"></h2>
-                <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
-                <div>
-                    <video style="width:100%;" th:src="@{${temp.videoUrl}}" controls></video>
-                </div>
-                <p>Video Description</p>
-                <p th:text="${temp.description}"></p>
-                <button type="submit">
-                    <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
-                </button>
-                <form action="/watchlater" method="post">
-                    <button type="submit">Add to Watch Later</button>
-                </form>
-            </div>
-
-        </div>
-        <div class="rightcolumn">
-            <div class="card">
-                <div class="thumb">
-                    <img th:src="@{${temp.thumbnailUrl}}" alt="">
-                </div>
-                <div class="content">
-                    <form action="/like" method="post">
-                        <button type="submit">
-                            <i class="fas fa-thumbs-up" th:text="'  '+${temp.likes}" style="font-size:20px;"></i></button>
-                    </form>
-                    <form action="/dislike" method="post">
-                        <button type="submit">
-                            <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i> </button>
-                    </form>
-
-                    <details>
-                        <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
-                        <div th:each="temp2:${temp.mediaComment}">
-                            <li th:text="${temp2.commentby} + ' : '+${temp2.comment}"></li>
-                        </div>
-
-                    </details>
-                    <textarea></textarea> <br>
-                    <button>Add Comment</button>
-                </div>
-            </div>
+<br>
+<!-- main content goes here , If condition-->
+<div class="thumb" th:if="${sessionUser != null}">
+    <!-- For starts here -->
+    <div th:each="temp:${list}">
+        <div class="video" th:if="${temp.visibility != 'Private'}">
+        <h3 th:text="${temp.title}"></h3>
+        <h5 th:text="'Posted on '+${temp.createdAt}+' by '+${temp.owner}"></h5>
+        <h5 th:text="'Play Time : '+${temp.duration}+' Total Views: '+${temp.views}"></h5>
+                <img th:src="@{${temp.thumbnailUrl}}" alt="">
+        <form action="/videopage" method="post">
+            <input type="hidden" th:value="${temp.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">
+                Play Video
+            </button>
+        </form>
+        <hr>
+        <form action="/like" method="post">
+            <input type="hidden" th:value="${temp.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">
+                <i class="fas fa-thumbs-up" th:text="'  '+${temp.likes}" style="font-size:20px;"></i></button>
+        </form>
+        <form action="/dislike" method="post">
+            <input type="hidden" th:value="${temp.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">
+                <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i></button>
+        </form>
+            <form id="myform" th:action="@{/watchLater(id=${temp.id})}" th:object="${temp}" method="post">
+                <button th:if="${sessionUser != null and temp.saved != true}" type="submit" name="watchLater" id="watchLater"
+                >Add to Watch Later</button>
+            </form>
+            <form  th:action="@{/removeSaved(id=${temp.id})}" th:object="${temp}" method="post">
+                <button th:if="${sessionUser != null and temp.saved == true}" type="submit" name="removeSaved" id="removeSaved"
+                >Remove from Watch Later</button>
+            </form>
         </div>
     </div>
-</div> <br><br>
-<!-- End of first blog-->
+
+</div><!-- main content goes here -->
+
+
+<!-- Guest goes here , If condition-->
+<div class="thumb" th:if="${sessionUser == null}">
+    <!-- For starts here -->
+    <div th:each="temp:${list}">
+        <div class="video" th:if="${temp.visibility != 'Private'}">
+        <h3 th:text="${temp.title}"></h3>
+        <h5 th:text="'Posted on '+${temp.createdAt}+' by '+${temp.owner}"></h5>
+        <h5 th:text="'Play Time : '+${temp.duration}+' Total Views: '+${temp.views}"></h5>
+        <img th:src="@{${temp.thumbnailUrl}}" alt="">
+        <form action="/videopage" method="post">
+            <input type="hidden" th:value="${temp.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">
+                Play Video
+            </button>
+        </form>
+        <hr>
+        <form action="/like" method="post">
+            <input type="hidden" th:value="${temp.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" disabled>
+                <i class="fas fa-thumbs-up" th:text="'  '+${temp.likes}" style="font-size:20px;"></i></button>
+        </form>
+        <form action="/dislike" method="post">
+            <input type="hidden" th:value="${temp.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" disabled>
+                <i class="fas fa-thumbs-down" th:text="'  '+${temp.dislikes}" style="font-size:20px;"></i></button>
+        </form>
+        </div>
+    </div>
+
+</div><!-- main content goes here -->
+
 
 </body>
 

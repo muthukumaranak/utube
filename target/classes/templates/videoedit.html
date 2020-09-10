@@ -1,0 +1,76 @@
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<title>Video Edit</title>
+<style>
+body{
+font-size: 20px;
+background: #f2f2f2;
+}
+
+body{
+text-align: center;
+}
+.header{
+background: #242424;
+color: white;
+padding: 20px;
+}
+.header a{
+color: white;
+padding: 20px;
+text-decoration: none;
+}
+
+.container{
+margin: 20px;
+display: flex;
+}
+
+.container div{
+	background: #f5f5f5;
+    width: 50%;
+    margin-left: 25%;
+    margin-top: 20px;
+    border: 1px solid;
+  box-shadow: 5px 6px 6px 6px #888888;
+    }
+    .container div input[type="text"]{
+    margin-top: 20px;
+    padding: 10px;
+    width: 90%;}
+
+    button{
+    padding: 15px;
+    margin-top: 15px;
+    color: white;
+    background: #242424;
+    border: none;
+    }
+     button:hover{
+     background: #f3f3f3;
+     color: black;
+     border: 0.5px solid black;
+     }
+</style>
+<body>
+<div class="header">
+    <a href="/">Back to Home</a>
+</div>
+
+<div class="container">
+
+    <div th:each="temp:${list}">
+        <form action="/editvideo" method="post">
+            <h3>Edit your Video</h3> <hr>
+            <label>Video Title</label>
+            <input type="text" name="title" th:value="${temp.title}"> <br><br>
+            <label>Description</label>
+            <input type="text" name="description" th:value="${temp.description}"> <br>
+            <input type="hidden" th:value="${temp.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">Update Changes</button>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

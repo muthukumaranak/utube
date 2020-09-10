@@ -1,0 +1,137 @@
+<html  xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
+<title>Channel</title>
+<script src="https://kit.fontawesome.com/a076d05399.js"></script>
+<style>
+body{
+font-family: Arial;
+background: #f1f1f1;
+text-align: center;
+}
+
+.header{
+background: #242424;
+padding: 20px;
+}
+.header a{
+text-decoration: none;
+padding: 10px;
+color: white;
+}
+
+.main-container{
+display: flex;
+background: #f4f4f4;
+flex-direction: row;
+justify-content: space-evenly;
+}
+
+.main-container div{
+	text-align: center;
+	width: 40%;
+    background: #f8f8f8;
+    margin-top: 30px;
+    margin-bottom: 30px;
+    border: 0.5px solid #black;
+  box-shadow: 1px 1px 2px 2px;
+    }
+
+.main-container div img{
+width: 80%;}
+
+textarea, details{
+margin-top: 10px;}
+
+.main-container div button {
+            color: #f3f3f3;
+            background: #232323;
+            border: none;
+            width: 50%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            margin-left: auto;
+            padding: 10px;
+        }
+
+.main-container div button:hover{
+background: #f4f4f4;
+color: #242424;
+border: 0.5px solid black;}
+
+</style>
+<body>
+
+<div class="header">
+    <a href="/">Back to Home</a> </div>
+
+<div class="main-container" th:each="temp:${channel}">
+    <div>
+        <h2 th:text="${temp.channel}"></h2> <hr>
+        <h3 th:text="'Created on '+${temp.createdAt}"></h3>
+        <h3 th:text="${temp.description}"></h3>
+    </div>
+    <div>
+        <img th:src="@{${temp.coverUrl}}" alt="">
+    </div>
+</div>
+<hr>
+
+<h2> Channel Content </h2>
+<hr>
+<!-- Start of video -->
+<div>
+    <div class="main-container" th:each="temp2:${list}">
+        <div >
+            <h2 th:text="${temp2.title}"></h2> <hr>
+            <h3 th:text="'Play Time : '+${temp2.duration}+' mins'"></h3>
+            <h3 th:text="${temp2.description}"></h3>
+
+            <form action="/videopage" method="post">
+                <input type="hidden" th:value="${temp2.id}" name="id"/>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit">
+                    Play Video
+                </button>
+            </form>
+            <hr>
+            <form action="/like" method="post">
+                <input type="hidden" th:value="${temp2.id}" name="id"/>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit">
+                    <i class="fas fa-thumbs-up" th:text="'  '+${temp2.likes}" style="font-size:20px;"></i></button>
+            </form>
+            <form action="/dislike" method="post">
+                <input type="hidden" th:value="${temp2.id}" name="id"/>
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+                <button type="submit">
+                    <i class="fas fa-thumbs-down" th:text="'  '+${temp2.dislikes}" style="font-size:20px;"></i></button>
+            </form>
+
+        </div>
+        <div>
+            <img th:src="@{${temp2.thumbnailUrl}}" alt="">
+            <details>
+                <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
+                <div th:each="temp3:${temp2.mediaComment}">
+                    <li th:text="${temp3.commentby} + ' : '+${temp3.comment}"></li>
+                    <form action="/deletecomment" method="post">
+                        <input type="hidden" th:value="${temp3.id}" name="id"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="submit" value="Delete This Comment">
+                    </form>
+                </div>
+            </details>
+            <textarea></textarea> <br>
+            <button type="submit">Add Comment</button>
+        </div>
+    </div>
+
+</div>
+<!-- End of video -->
+
+</body>
+</html>
+
+
+
+
+
