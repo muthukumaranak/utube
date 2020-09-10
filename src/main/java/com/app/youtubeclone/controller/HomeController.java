@@ -1,10 +1,7 @@
 package com.app.youtubeclone.controller;
 
 import com.app.youtubeclone.entity.*;
-import com.app.youtubeclone.repository.ChannelRepo;
-import com.app.youtubeclone.repository.LibraryRepo;
-import com.app.youtubeclone.repository.MediaFileRepo;
-import com.app.youtubeclone.repository.UsersRepo;
+import com.app.youtubeclone.repository.*;
 import com.app.youtubeclone.service.ChannelService;
 import com.app.youtubeclone.service.CommentService;
 import com.app.youtubeclone.service.MediaService;
@@ -41,6 +38,8 @@ public class HomeController {
     @Autowired
     private ChannelRepo channelRepo;
 
+    @Autowired
+    private SubscriptionsRepo subscriptionsRepo;
 
     @Autowired
     UserService userService;
@@ -459,12 +458,7 @@ public class HomeController {
         return "redirect:/mychannel";
     }
 
-    @GetMapping("/mysubscriptions")
-    public String mysubscriptions(Model model){
-        List<Channel> channels = channelRepo.findAll();
-        model.addAttribute("list",channels);
-        return "subscriptions";
-    }
+
 
     @GetMapping("/editchannel")
     public String editchannel(Model model){
@@ -577,6 +571,42 @@ public class HomeController {
         });
         model.addAttribute("channel",channels);
         return "channel";
+    }
+
+    @PostMapping("/subscribe")
+    public String subscribe(@RequestParam int id){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        subscriptionsRepo.insert(id,auth.getName());
+        return "redirect:/mysubscriptions";
+    }
+
+    @PostMapping("/unsubscribe")
+    public String Unsubscribe(@RequestParam int id, Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        subscriptionsRepo.remove(id,auth.getName());
+        return "redirect:/mysubscriptions";
+    }
+
+    @GetMapping("/mysubscriptions")
+    public String mysubscriptions(Model model){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        Users users = usersRepo.findByEmail(auth.getName());
+        List<Channel> list = channelRepo.findAll();
+        List<Channel> s = new LinkedList<>();
+        List<Channel> u = new LinkedList<>();
+        List<Integer> ids = subscriptionsRepo.findbyuser(auth.getName());
+        for(Channel channel : list){
+            //System.err.println(channel.getChannel());
+            if(ids.contains(channel.getId()))
+                s.add(channel);
+            else
+                u.add(channel);
+        }
+        model.addAttribute("subscribed",s);
+        model.addAttribute("unsubscribed",u);
+        return "subscriptions";
     }
 }
 

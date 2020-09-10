@@ -71,7 +71,7 @@
 
 <div class="container">
     <!-- Main content -->
-    <div th:each="temp:${list}">
+    <div th:each="temp:${subscribed}">
         <img th:src="@{${temp.coverUrl}}" alt="">
         <h2 th:text="${temp.channel}"></h2>
         <hr>
@@ -79,7 +79,7 @@
         <form action="/unsubscribe" method="post">
             <input type="hidden" th:value="${temp.id}" name="id"/>
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-            <button type="submit">Subscribe</button>
+            <button type="submit">UnSubscribe</button>
         </form>
         <form action="/viewchannel" method="post">
             <input type="hidden" th:value="${temp.id}" name="id"/>
@@ -88,6 +88,23 @@
         </form>
     </div>
     <!-- Main content -->
+    <!-- content for unsubscribed channels -->
+    <div th:each="temp2:${unsubscribed}">
+        <img th:src="@{${temp2.coverUrl}}" alt="">
+        <h2 th:text="${temp2.channel}"></h2>
+        <hr>
+        <p th:text="${temp2.description}"></p>
+        <form action="/subscribe" method="post">
+            <input type="hidden" th:value="${temp2.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">Subscribe</button>
+        </form>
+        <form action="/viewchannel" method="post">
+            <input type="hidden" th:value="${temp2.id}" name="id"/>
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit">View Channel</button>
+        </form>
+    </div>
 </div>
 
 </body>
