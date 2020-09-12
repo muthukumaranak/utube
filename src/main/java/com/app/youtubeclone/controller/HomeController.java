@@ -209,6 +209,9 @@ public class HomeController {
                     channel.setCreatedAt(channelcontent.getCreatedAt());
                     channels.add(channel);
                 });
+        int channelId = channelRepo.findChannelIdByOwner(auth.getName());
+        int total_Subscribers = subscriptionsRepo.findSubs(channelId);
+        model.addAttribute("subscriberstotal",total_Subscribers);
         model.addAttribute("channel",channels);
         return "mychannel";
     }

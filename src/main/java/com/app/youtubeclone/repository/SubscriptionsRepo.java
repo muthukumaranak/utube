@@ -26,4 +26,7 @@ public interface SubscriptionsRepo extends JpaRepository<Subscriptions, Integer>
 
     @Query(value = "select channelid from subscriptions where username=?1",nativeQuery = true)
     List<Integer> findbyuser(String name);
+
+    @Query(value = "select count(*) from subscriptions where channelid = ?1", nativeQuery = true)
+    int findSubs(int channelId);
 }

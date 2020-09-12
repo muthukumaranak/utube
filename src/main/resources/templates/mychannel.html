@@ -179,8 +179,8 @@
     </div>
     <hr>
     <p th:text="${temp.description}"></p>
-    <p><i th:text="'  '+${temp.subscribers} + '  Subscribers'" class="fa fa-users" style="color:black;"></i></p>
-    <p>1k Views <i class="fa fa-eye"></i></p>
+    <p><i th:text="'  '+${subscriberstotal} + '  Subscribers'" class="fa fa-users" style="color:black;"></i></p>
+    
     <form action="/editchannel" method="get">
         <button type="submit" style="margin-left: 20px;">Edit Channel</button>
         <a href="/"><button type="button" class="floatr">Home Page</button></a>
@@ -203,7 +203,7 @@
                 <h5 th:text="'Posted on '+${temp.createdAt}"></h5>
                 <h5 th:text="'Duration '+${temp.duration}"></h5>
                 <div class="video">
-                    <video th:src="@{${temp.videoUrl}}" controls></video>
+                    <video th:src="@{${temp.videoUrl}}" style="width: 90%; height: 300px;" controls></video>
                 </div>
                 <p>Video Description</p>
                 <p th:text="${temp.description}"></p>
@@ -259,9 +259,13 @@
                             </form>
                         </div>
 
-                    </details>
-                    <textarea></textarea> <br>
-                    <button>Add your Comment</button>
+                    </details> <br>
+                    <form action="/comment" method="post">
+                        <input type="hidden" th:value="${temp.id}" name="id"/>
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <textarea name="comment"></textarea>  <br>
+                        <button type="submit">Add Comment</button>
+                    </form>
                 </div>
             </div>
         </div>

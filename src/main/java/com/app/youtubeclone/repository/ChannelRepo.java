@@ -37,4 +37,7 @@ public interface ChannelRepo extends JpaRepository<Channel, Long> {
             "inner JOIN subscriptions\n" +
             "ON channels.id != subscriptions.channelid where subscriptions.username=?1",nativeQuery = true)
     List<Channel> findUnSubscribed(String name);
+
+    @Query(value = "select id from channels where owner = ?1", nativeQuery = true)
+    int findChannelIdByOwner(String name);
 }

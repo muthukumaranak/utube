@@ -50,20 +50,7 @@ margin-bottom: 20px;}
     <button type="submit">
         <i class="fa fa-eye" th:text="'  '+${temp.views}"></i>
     </button>
-    <form action="/subscribe"  method="post">
-        <input type="hidden" th:value="channelName">
-        <input type="hidden" th:value="${temp.id}" name="id"/>
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        <button onclick="return click(this)" th:if="${sessionUser != null}" type="submit" name="subscribe" id="subscribe"
-        >Subscribe</button>
-        <script type="text/javascript">
-	       function click(btn){
-              // Preventing button from clicking
-              document.getElementById(btn.id).disabled = true;
-              return true;
-   }
-</script>
-    </form>
+
     <details>
         <summary>View Comments &nbsp;<i class="fa fa-comment" aria-hidden="true"></i></summary>
         <div th:each="temp2:${temp.mediaComment}">
