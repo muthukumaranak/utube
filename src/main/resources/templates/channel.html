@@ -122,7 +122,7 @@ border: 0.5px solid black;}
             </details>
              <br>
            <form action="/comment" method="post">
-                        <input type="hidden" th:value="${temp.id}" name="id"/>
+                        <input type="hidden" th:value="${temp3.id}" name="id"/>
                         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                         <textarea name="comment"></textarea>  <br>
                         <button type="submit">Add Comment</button>
